@@ -1,6 +1,6 @@
 ﻿namespace ProjectReferencesBuilder.Entities.Enums
 {
-    internal enum ProjectType
+    public enum ProjectType
     {
         Pre2017Style,
         SDKStyle,

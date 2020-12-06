@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProjectReferencesBuilder.Entities.Enums;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -11,6 +12,8 @@ namespace ProjectReferencesBuilder.Entities.Models
         public string TFM { get; set; }
 
         public string AbsolutePath { get; set; }
+
+        public ProjectType ProjectType { get; set; }
 
         public IEnumerable<ProjectInfo> ProjectsReferenced { get; set; }
     }

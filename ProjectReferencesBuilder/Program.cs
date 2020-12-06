@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace ProjectReferencesBuilder
 {
@@ -13,12 +14,36 @@ namespace ProjectReferencesBuilder
     {
         private static void SetProjectInfo(ProjectInfo projectToSetInfoFor)
         {
-            projectToSetInfoFor.ProjectsReferenced = GetProjectsReferencedByProject(projectToSetInfoFor.AbsolutePath);
+            SetProjectType(projectToSetInfoFor);
+            SetProjectTFM(projectToSetInfoFor);
+            SetProjectsReferencedByProject(projectToSetInfoFor);
         }
 
-        private static IEnumerable<ProjectInfo> GetProjectsReferencedByProject(string projectFilePath)
+        private static void SetProjectTFM(ProjectInfo projectInfo)
         {
-            switch (GetProjectType(projectFilePath))
+            switch (projectInfo.ProjectType)
+            {
+                case ProjectType.Pre2017Style:
+                    throw new NotImplementedException("Pre-2017 style csproj files are not yet supported.");
+                    break;
+                case ProjectType.SDKStyle:
+                    XmlDocument xmldoc = new XmlDocument();
+                    xmldoc.Load(projectInfo.AbsolutePath);
+
+                    XmlNamespaceManager mgr = new XmlNamespaceManager(xmldoc.NameTable);
+                    mgr.AddNamespace("x", "http://schemas.microsoft.com/developer/msbuild/2003");
+
+                    foreach (XmlNode item in xmldoc.SelectNodes("Project/PropertyGroup/TargetFramework|Project/PropertyGroup/TargetFrameworks", mgr))
+                    {
+                        projectInfo.TFM = item.InnerXml;
+                    }
+                    break;
+            }
+        }
+
+        private static void SetProjectsReferencedByProject(ProjectInfo projectInfo)
+        {
+            switch (projectInfo.ProjectType)
             {
                 case ProjectType.Pre2017Style:
                     throw new NotImplementedException("Pre-2017 style csproj files are not yet supported.");
@@ -30,7 +55,7 @@ namespace ProjectReferencesBuilder
                     throw new NotSupportedException("How did you get here?");
             }
 
-            return new List<ProjectInfo>();
+            projectInfo.ProjectsReferenced = null;
         }
 
         private static IEnumerable<ProjectInfo> BuildDependencyDictionary(string solutionFilePath)
@@ -59,21 +84,23 @@ namespace ProjectReferencesBuilder
             return projectsInSolution;
         }
 
-        private static ProjectType GetProjectType(string projectFilePath)
+        private static void SetProjectType(ProjectInfo projectInfo)
         {
-            if (FileHelper.GetFileExtension(projectFilePath) != ".csproj")
+            if (FileHelper.GetFileExtension(projectInfo.AbsolutePath) != ".csproj")
             {
-                throw new ArgumentException("This file is not a .csproj file.", nameof(projectFilePath));
+                throw new ArgumentException("This file is not a .csproj file.", nameof(projectInfo));
             }
 
-            var fileContents = FileHelper.GetFileContents(projectFilePath);
+            var fileContents = FileHelper.GetFileContents(projectInfo.AbsolutePath);
 
             if (fileContents.First() == "<Project Sdk=\"Microsoft.NET.Sdk\">")
             {
-                return ProjectType.SDKStyle;
+                projectInfo.ProjectType = ProjectType.SDKStyle;
             }
-
-            return ProjectType.Pre2017Style;
+            else //TODO: Actually check first-line for non-SDK style projects and throw exception if we can't determine
+            {
+                projectInfo.ProjectType = ProjectType.Pre2017Style;
+            }
         }
 
         static void Main(string[] args)
