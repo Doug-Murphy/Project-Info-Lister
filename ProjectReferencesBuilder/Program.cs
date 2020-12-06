@@ -31,7 +31,6 @@ namespace ProjectReferencesBuilder
                     xmldoc.Load(projectInfo.AbsolutePath);
 
                     XmlNamespaceManager mgr = new XmlNamespaceManager(xmldoc.NameTable);
-                    mgr.AddNamespace("x", "http://schemas.microsoft.com/developer/msbuild/2003");
 
                     foreach (XmlNode item in xmldoc.SelectNodes("Project/PropertyGroup/TargetFramework|Project/PropertyGroup/TargetFrameworks", mgr))
                     {

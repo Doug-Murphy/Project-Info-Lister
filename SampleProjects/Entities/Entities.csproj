@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClassLibrary2\Entities.Interface.csproj" />
+    <ProjectReference Include="..\Entities.Interface\Entities.Interface.csproj" />
   </ItemGroup>
 
 </Project>
