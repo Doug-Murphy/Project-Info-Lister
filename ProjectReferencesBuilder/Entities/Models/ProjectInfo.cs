@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace ProjectReferencesBuilder.Entities.Models
 {
@@ -13,9 +14,10 @@ namespace ProjectReferencesBuilder.Entities.Models
 
         public string AbsolutePath { get; set; }
 
+        [JsonIgnore]
         public ProjectType ProjectType { get; set; }
 
-        public IEnumerable<ProjectInfo> ProjectsReferenced { get; set; }
+        public List<ProjectInfo> ProjectsReferenced { get; set; }
     }
 
     public class ProjectInfoComparer : IEqualityComparer<ProjectInfo>

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -102,6 +103,11 @@ namespace ProjectReferencesBuilder
             }
         }
 
+        private static void PrintResults(IEnumerable<ProjectInfo> consolidatedData)
+        {
+            Console.WriteLine(JsonSerializer.Serialize(consolidatedData, new JsonSerializerOptions { WriteIndented = true }));
+        }
+
         static void Main(string[] args)
         {
             string solutionFilePath;
@@ -117,6 +123,8 @@ namespace ProjectReferencesBuilder
             }
 
             var projectsWithDependencies = BuildDependencyDictionary(solutionFilePath);
+
+            PrintResults(projectsWithDependencies);
         }
     }
 }
