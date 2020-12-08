@@ -15,9 +15,9 @@ namespace ProjectReferencesBuilder.Entities.Models
         public string AbsolutePath { get; set; }
 
         [JsonIgnore]
-        public ProjectType ProjectType { get; set; }
+        public ProjectType? ProjectType { get; set; }
 
-        public List<ProjectInfo> ProjectsReferenced { get; set; }
+        public List<ProjectInfo> ProjectsReferenced { get; set; } = new List<ProjectInfo>();
     }
 
     public class ProjectInfoComparer : IEqualityComparer<ProjectInfo>

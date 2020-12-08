@@ -13,11 +13,29 @@ namespace ProjectReferencesBuilder
 {
     class Program
     {
+        //TODO: Don't use global vars! Probably want to use an instanced class or something anyway.
+        private static string _solutionFilePath;
+        private static HashSet<ProjectInfo> _projectsInSolution = new HashSet<ProjectInfo>();
+
+        private static XmlDocument ParseSdkStyleProject(ProjectInfo projectInfo)
+        {
+            XmlDocument xmldoc = new XmlDocument();
+            xmldoc.Load(projectInfo.AbsolutePath);
+
+            return xmldoc;
+        }
+
         private static void SetProjectInfo(ProjectInfo projectToSetInfoFor)
         {
+            SetProjectName(projectToSetInfoFor);
             SetProjectType(projectToSetInfoFor);
             SetProjectTFM(projectToSetInfoFor);
             SetProjectsReferencedByProject(projectToSetInfoFor);
+        }
+
+        private static void SetProjectName(ProjectInfo projectToSetInfoFor)
+        {
+            projectToSetInfoFor.Name = _projectsInSolution.FirstOrDefault(x => x.AbsolutePath == projectToSetInfoFor.AbsolutePath)?.Name;
         }
 
         private static void SetProjectTFM(ProjectInfo projectInfo)
@@ -28,12 +46,10 @@ namespace ProjectReferencesBuilder
                     throw new NotImplementedException("Pre-2017 style csproj files are not yet supported.");
                     break;
                 case ProjectType.SDKStyle:
-                    XmlDocument xmldoc = new XmlDocument();
-                    xmldoc.Load(projectInfo.AbsolutePath);
+                    var xmlDoc = ParseSdkStyleProject(projectInfo);
+                    XmlNamespaceManager mgr = new XmlNamespaceManager(xmlDoc.NameTable);
 
-                    XmlNamespaceManager mgr = new XmlNamespaceManager(xmldoc.NameTable);
-
-                    foreach (XmlNode item in xmldoc.SelectNodes("Project/PropertyGroup/TargetFramework|Project/PropertyGroup/TargetFrameworks", mgr))
+                    foreach (XmlNode item in xmlDoc.SelectNodes("Project/PropertyGroup/TargetFramework|Project/PropertyGroup/TargetFrameworks", mgr))
                     {
                         projectInfo.TFM = item.InnerXml;
                     }
@@ -49,13 +65,19 @@ namespace ProjectReferencesBuilder
                     throw new NotImplementedException("Pre-2017 style csproj files are not yet supported.");
                     break;
                 case ProjectType.SDKStyle:
+                    var xmlDoc = ParseSdkStyleProject(projectInfo);
+                    XmlNamespaceManager mgr = new XmlNamespaceManager(xmlDoc.NameTable);
 
+                    foreach (XmlNode item in xmlDoc.SelectNodes("Project/ItemGroup/ProjectReference", mgr))
+                    {
+                        var referencedProjectInfo = new ProjectInfo { AbsolutePath = Path.GetFullPath(item.Attributes["Include"].Value, FileHelper.GetFileDirectory(projectInfo.AbsolutePath)) };
+                        SetProjectInfo(referencedProjectInfo);
+                        projectInfo.ProjectsReferenced.Add(referencedProjectInfo);
+                    }
                     break;
                 default:
                     throw new NotSupportedException("How did you get here?");
             }
-
-            projectInfo.ProjectsReferenced = null;
         }
 
         private static IEnumerable<ProjectInfo> BuildDependencyDictionary(string solutionFilePath)
@@ -69,19 +91,18 @@ namespace ProjectReferencesBuilder
             var projectLineRegEx = new Regex(@"Project\(""\{.*\}""\).*""(.*)"",.*""(.*.csproj)", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
             var projectLineMatches = projectLineRegEx.Matches(string.Join("\n", fileContents));
             
-            var projectsInSolution = new HashSet<ProjectInfo>();
             for (int i = 0; i < projectLineMatches.Count; i++)
             {
                 var fullyQualifiedPath = Path.GetFullPath(projectLineMatches[i].Groups[2].Value, FileHelper.GetFileDirectory(solutionFilePath));
-                projectsInSolution.Add(new ProjectInfo { Name = projectLineMatches[i].Groups[1].Value, AbsolutePath = fullyQualifiedPath } );
+                _projectsInSolution.Add(new ProjectInfo { Name = projectLineMatches[i].Groups[1].Value, AbsolutePath = fullyQualifiedPath } );
             }
 
-            foreach (var projectInSolution in projectsInSolution)
+            foreach (var projectInSolution in _projectsInSolution)
             {
                 SetProjectInfo(projectInSolution);
             }
 
-            return projectsInSolution;
+            return _projectsInSolution;
         }
 
         private static void SetProjectType(ProjectInfo projectInfo)
@@ -97,7 +118,7 @@ namespace ProjectReferencesBuilder
             {
                 projectInfo.ProjectType = ProjectType.SDKStyle;
             }
-            else //TODO: Actually check first-line for non-SDK style projects and throw exception if we can't determine
+            else //TODO: Actually check for non-SDK style projects and throw exception if we can't determine type
             {
                 projectInfo.ProjectType = ProjectType.Pre2017Style;
             }
@@ -110,19 +131,18 @@ namespace ProjectReferencesBuilder
 
         static void Main(string[] args)
         {
-            string solutionFilePath;
 
             if (args.Length == 1)
             {
-                solutionFilePath = args[0];
+                _solutionFilePath = args[0];
             }
             else
             {
                 Console.Write("Enter the full path to the solution (.sln) file:");
-                solutionFilePath = Console.ReadLine();
+                _solutionFilePath = Console.ReadLine();
             }
 
-            var projectsWithDependencies = BuildDependencyDictionary(solutionFilePath);
+            var projectsWithDependencies = BuildDependencyDictionary(_solutionFilePath);
 
             PrintResults(projectsWithDependencies);
         }
