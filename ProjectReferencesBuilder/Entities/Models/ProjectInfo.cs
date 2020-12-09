@@ -8,11 +8,16 @@ namespace ProjectReferencesBuilder.Entities.Models
 {
     public class ProjectInfo
     {
+        public ProjectInfo(string absolutePath)
+        {
+            AbsolutePath = absolutePath;
+        }
+
         public string Name { get; set; }
 
         public string TFM { get; set; }
 
-        public string AbsolutePath { get; set; }
+        public string AbsolutePath { get; init; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public ProjectType? ProjectType { get; set; }
