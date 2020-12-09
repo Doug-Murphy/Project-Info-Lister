@@ -49,7 +49,6 @@ namespace ProjectReferencesBuilder.Helpers
             switch (projectInfo.ProjectType)
             {
                 case ProjectType.Pre2017Style:
-                    Console.WriteLine($"Found old style for project with path {projectInfo.AbsolutePath}");
                     xmlManager.AddNamespace("x", "http://schemas.microsoft.com/developer/msbuild/2003");
 
                     foreach (XmlNode item in projectFileXmlDocument.SelectNodes("//x:TargetFrameworkVersion", xmlManager))
@@ -76,7 +75,6 @@ namespace ProjectReferencesBuilder.Helpers
             switch (projectInfo.ProjectType)
             {
                 case ProjectType.Pre2017Style:
-                    Console.WriteLine($"Found old style for project with path {projectInfo.AbsolutePath}");
 
                     break;
                 case ProjectType.SDKStyle:
