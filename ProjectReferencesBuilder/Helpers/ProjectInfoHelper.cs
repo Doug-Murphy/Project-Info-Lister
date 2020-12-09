@@ -43,35 +43,44 @@ namespace ProjectReferencesBuilder.Helpers
 
         private static void SetProjectTFM(ProjectInfo projectInfo)
         {
+            var projectFileXmlDocument = ParseProjectFileXml(projectInfo);
+            XmlNamespaceManager xmlManager = new XmlNamespaceManager(projectFileXmlDocument.NameTable);
+
             switch (projectInfo.ProjectType)
             {
                 case ProjectType.Pre2017Style:
-                    throw new NotImplementedException("Pre-2017 style csproj files are not yet supported.");
-                    break;
-                case ProjectType.SDKStyle:
-                    var xmlDoc = ParseSdkStyleProject(projectInfo);
-                    XmlNamespaceManager mgr = new XmlNamespaceManager(xmlDoc.NameTable);
+                    Console.WriteLine($"Found old style for project with path {projectInfo.AbsolutePath}");
+                    xmlManager.AddNamespace("x", "http://schemas.microsoft.com/developer/msbuild/2003");
 
-                    foreach (XmlNode item in xmlDoc.SelectNodes("Project/PropertyGroup/TargetFramework|Project/PropertyGroup/TargetFrameworks", mgr))
+                    foreach (XmlNode item in projectFileXmlDocument.SelectNodes("//x:TargetFrameworkVersion", xmlManager))
                     {
                         projectInfo.TFM = item.InnerXml;
                     }
                     break;
+                case ProjectType.SDKStyle:
+                    foreach (XmlNode item in projectFileXmlDocument.SelectNodes("Project/PropertyGroup/TargetFramework|Project/PropertyGroup/TargetFrameworks", xmlManager))
+                    {
+                        projectInfo.TFM = item.InnerXml;
+                    }
+                    break;
+                default:
+                    throw new NotSupportedException("How did you get here?");
             }
         }
 
         private static void SetProjectsReferencedByProject(ProjectInfo projectInfo)
         {
+            var projectFileXmlDocument = ParseProjectFileXml(projectInfo);
+            XmlNamespaceManager xmlManager = new XmlNamespaceManager(projectFileXmlDocument.NameTable);
+
             switch (projectInfo.ProjectType)
             {
                 case ProjectType.Pre2017Style:
-                    throw new NotImplementedException("Pre-2017 style csproj files are not yet supported.");
+                    Console.WriteLine($"Found old style for project with path {projectInfo.AbsolutePath}");
+
                     break;
                 case ProjectType.SDKStyle:
-                    var xmlDoc = ParseSdkStyleProject(projectInfo);
-                    XmlNamespaceManager mgr = new XmlNamespaceManager(xmlDoc.NameTable);
-
-                    foreach (XmlNode item in xmlDoc.SelectNodes("Project/ItemGroup/ProjectReference", mgr))
+                    foreach (XmlNode item in projectFileXmlDocument.SelectNodes("Project/ItemGroup/ProjectReference", xmlManager))
                     {
                         var referencedProjectInfo = new ProjectInfo(Path.GetFullPath(item.Attributes["Include"].Value, FileHelper.GetFileDirectory(projectInfo.AbsolutePath)));
                         SetProjectInfo(referencedProjectInfo);
@@ -83,7 +92,7 @@ namespace ProjectReferencesBuilder.Helpers
             }
         }
 
-        private static XmlDocument ParseSdkStyleProject(ProjectInfo projectInfo)
+        private static XmlDocument ParseProjectFileXml(ProjectInfo projectInfo)
         {
             XmlDocument xmldoc = new XmlDocument();
             xmldoc.Load(projectInfo.AbsolutePath);
