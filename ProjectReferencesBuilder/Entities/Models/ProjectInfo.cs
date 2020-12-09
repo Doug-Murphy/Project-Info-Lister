@@ -14,7 +14,7 @@ namespace ProjectReferencesBuilder.Entities.Models
 
         public string AbsolutePath { get; set; }
 
-        [JsonIgnore]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public ProjectType? ProjectType { get; set; }
 
         public List<ProjectInfo> ProjectsReferenced { get; set; } = new List<ProjectInfo>();
