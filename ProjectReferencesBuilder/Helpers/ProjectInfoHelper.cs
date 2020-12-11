@@ -75,7 +75,14 @@ namespace ProjectReferencesBuilder.Helpers
             switch (projectInfo.ProjectType)
             {
                 case ProjectType.Pre2017Style:
+                    xmlManager.AddNamespace("x", "http://schemas.microsoft.com/developer/msbuild/2003");
 
+                    foreach (XmlNode item in projectFileXmlDocument.SelectNodes("//x:ProjectReference", xmlManager))
+                    {
+                        var referencedProjectInfo = new ProjectInfo(Path.GetFullPath(item.Attributes["Include"].Value, FileHelper.GetFileDirectory(projectInfo.AbsolutePath)));
+                        SetProjectInfo(referencedProjectInfo);
+                        projectInfo.ProjectsReferenced.Add(referencedProjectInfo);
+                    }
                     break;
                 case ProjectType.SDKStyle:
                     foreach (XmlNode item in projectFileXmlDocument.SelectNodes("Project/ItemGroup/ProjectReference", xmlManager))
