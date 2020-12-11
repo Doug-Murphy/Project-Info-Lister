@@ -39,6 +39,10 @@
       <Project>{ac30ea14-2d3e-4c43-a503-8f279b4c06f0}</Project>
       <Name>Entities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Services\Services.csproj">
+      <Project>{7a513278-effa-4787-96b4-e639751c76f0}</Project>
+      <Name>Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
