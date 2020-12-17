@@ -18,5 +18,8 @@ The target framework of the project.
 ## Absolute Path
 The fully qualified path to the .csproj file.
 
+## Project Type
+Whether the .csproj file is the newer SDK style or the older pre-2017 style.
+
 ## Projects Referenced
 All projects that the project references. Displays all of the same data listed here for all referenced projects.
