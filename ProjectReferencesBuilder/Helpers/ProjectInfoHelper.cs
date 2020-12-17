@@ -31,7 +31,7 @@ namespace ProjectReferencesBuilder.Helpers
 
             var fileContents = FileHelper.GetFileContents(projectInfo.AbsolutePath);
 
-            if (fileContents.First() == "<Project Sdk=\"Microsoft.NET.Sdk\">")
+            if (fileContents.First().StartsWith("<Project Sdk="))
             {
                 projectInfo.ProjectType = ProjectType.SDKStyle;
             }
