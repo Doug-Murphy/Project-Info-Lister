@@ -20,13 +20,11 @@ namespace ProjectReferencesBuilder
             {
                 solutionFilePath = args[0];
             }
-            else
+
+            while (FileHelper.GetFileExtension(solutionFilePath) != ".sln")
             {
-                while (FileHelper.GetFileExtension(solutionFilePath) != ".sln")
-                {
-                    Console.Write("Enter the full path to the solution (.sln) file: ");
-                    solutionFilePath = Console.ReadLine();
-                }
+                Console.Write("Enter the full path to the solution (.sln) file: ");
+                solutionFilePath = Console.ReadLine();
             }
 
             solutionFilePath = solutionFilePath.Trim('"');
