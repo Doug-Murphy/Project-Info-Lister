@@ -1,28 +1,51 @@
 ﻿using ProjectReferencesBuilder.Entities.Enums;
 using ProjectReferencesBuilder.Entities.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
 
 namespace ProjectReferencesBuilder.Helpers
 {
-    public static class ProjectInfoHelper
+    public sealed class ProjectInfoHelper
     {
-        public static void SetProjectInfo(ProjectInfo projectToSetInfoFor)
+        private readonly bool _includeName;
+        private readonly bool _includeReferences;
+        private readonly bool _includeTfm;
+
+        public ProjectInfoHelper(bool includeName,
+                                 bool includeReferences,
+                                 bool includeTfm)
         {
-            SetProjectName(projectToSetInfoFor);
-            SetProjectType(projectToSetInfoFor);
-            SetProjectTFM(projectToSetInfoFor);
-            SetProjectsReferencedByProject(projectToSetInfoFor);
+            _includeName = includeName;
+            _includeReferences = includeReferences;
+            _includeTfm = includeTfm;
         }
 
-        private static void SetProjectName(ProjectInfo projectToSetInfoFor)
+        public void SetProjectInfo(ProjectInfo projectToSetInfoFor)
+        {
+            SetProjectType(projectToSetInfoFor);
+            if (_includeName)
+            {
+                SetProjectName(projectToSetInfoFor);
+            }
+            if (_includeTfm)
+            {
+                SetProjectTFM(projectToSetInfoFor);
+            }
+            if (_includeReferences)
+            {
+                SetProjectsReferencedByProject(projectToSetInfoFor);
+            }
+        }
+
+        private void SetProjectName(ProjectInfo projectToSetInfoFor)
         {
             projectToSetInfoFor.Name = Path.GetFileNameWithoutExtension(projectToSetInfoFor.AbsolutePath);
         }
 
-        private static void SetProjectType(ProjectInfo projectInfo)
+        private void SetProjectType(ProjectInfo projectInfo)
         {
             if (FileHelper.GetFileExtension(projectInfo.AbsolutePath) != ".csproj")
             {
@@ -41,7 +64,7 @@ namespace ProjectReferencesBuilder.Helpers
             }
         }
 
-        private static void SetProjectTFM(ProjectInfo projectInfo)
+        private void SetProjectTFM(ProjectInfo projectInfo)
         {
             var projectFileXmlDocument = ParseProjectFileXml(projectInfo);
             XmlNamespaceManager xmlManager = new XmlNamespaceManager(projectFileXmlDocument.NameTable);
@@ -67,10 +90,11 @@ namespace ProjectReferencesBuilder.Helpers
             }
         }
 
-        private static void SetProjectsReferencedByProject(ProjectInfo projectInfo)
+        private void SetProjectsReferencedByProject(ProjectInfo projectInfo)
         {
             var projectFileXmlDocument = ParseProjectFileXml(projectInfo);
             XmlNamespaceManager xmlManager = new XmlNamespaceManager(projectFileXmlDocument.NameTable);
+            projectInfo.ProjectsReferenced ??= new List<ProjectInfo>();
 
             switch (projectInfo.ProjectType)
             {
@@ -97,7 +121,7 @@ namespace ProjectReferencesBuilder.Helpers
             }
         }
 
-        private static XmlDocument ParseProjectFileXml(ProjectInfo projectInfo)
+        private XmlDocument ParseProjectFileXml(ProjectInfo projectInfo)
         {
             XmlDocument xmldoc = new XmlDocument();
             xmldoc.Load(projectInfo.AbsolutePath);

@@ -1,4 +1,5 @@
 ﻿using ProjectReferencesBuilder.Entities.Models;
+using ProjectReferencesBuilder.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,11 +7,36 @@ using System.Text.RegularExpressions;
 
 namespace ProjectReferencesBuilder.Helpers
 {
-    public class ProjectInfoService
+    public sealed class ProjectInfoService : IProjectInfoSetter
     {
-        private readonly HashSet<ProjectInfo> _projectsInSolution = new HashSet<ProjectInfo>();
+        private bool _includeName;
+        private bool _includeTfm;
+        private bool _includeReferences;
 
-        public IEnumerable<ProjectInfo> BuildProjectInfo(string solutionFilePath)
+        public static IProjectInfoSetter Start() => new ProjectInfoService();
+
+        public IProjectInfoSetter WithName()
+        {
+            _includeName = true;
+
+            return this;
+        }
+
+        public IProjectInfoSetter WithReferences()
+        {
+            _includeReferences = true;
+
+            return this;
+        }
+
+        public IProjectInfoSetter WithTfm()
+        {
+            _includeTfm = true;
+
+            return this;
+        }
+
+        public HashSet<ProjectInfo> GetInfo(string solutionFilePath)
         {
             if (FileHelper.GetFileExtension(solutionFilePath) != ".sln")
             {
@@ -20,19 +46,21 @@ namespace ProjectReferencesBuilder.Helpers
             var fileContents = FileHelper.GetFileContents(solutionFilePath);
             var projectLineRegEx = new Regex(@"Project\(""\{.*\}""\).*""(.*)"",.*""(.*.csproj)", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
             var projectLineMatches = projectLineRegEx.Matches(string.Join("\n", fileContents));
+            var projectsInSolution = new HashSet<ProjectInfo>();
+            var projectInfoHelper = new ProjectInfoHelper(_includeName, _includeReferences, _includeTfm);
 
             for (int i = 0; i < projectLineMatches.Count; i++)
             {
                 var fullyQualifiedPath = Path.GetFullPath(projectLineMatches[i].Groups[2].Value, FileHelper.GetFileDirectory(solutionFilePath));
-                _projectsInSolution.Add(new ProjectInfo(fullyQualifiedPath));
+                projectsInSolution.Add(new ProjectInfo(fullyQualifiedPath));
             }
 
-            foreach (var projectInSolution in _projectsInSolution)
+            foreach (var projectInSolution in projectsInSolution)
             {
-                ProjectInfoHelper.SetProjectInfo(projectInSolution);
+                projectInfoHelper.SetProjectInfo(projectInSolution);
             }
 
-            return _projectsInSolution;
+            return projectsInSolution;
         }
     }
 }

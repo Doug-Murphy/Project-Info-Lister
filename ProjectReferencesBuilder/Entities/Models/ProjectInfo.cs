@@ -13,16 +13,21 @@ namespace ProjectReferencesBuilder.Entities.Models
             AbsolutePath = absolutePath;
         }
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Name { get; set; }
 
-        public string TFM { get; set; }
-
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string AbsolutePath { get; init; }
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string TFM { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public ProjectType? ProjectType { get; set; }
 
-        public List<ProjectInfo> ProjectsReferenced { get; set; } = new List<ProjectInfo>();
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<ProjectInfo> ProjectsReferenced { get; set; }
     }
 
     public class ProjectInfoComparer : IEqualityComparer<ProjectInfo>

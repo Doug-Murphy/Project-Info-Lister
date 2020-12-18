@@ -28,9 +28,9 @@ namespace ProjectReferencesBuilder
             }
 
             solutionFilePath = solutionFilePath.Trim('"');
-            var projectsWithDependencies = new ProjectInfoService().BuildProjectInfo(solutionFilePath);
+            var projectsWithInfo = ProjectInfoService.Start().WithName().WithReferences().WithTfm().GetInfo(solutionFilePath);
 
-            PrintResults(projectsWithDependencies);
+            PrintResults(projectsWithInfo);
         }
     }
 }
