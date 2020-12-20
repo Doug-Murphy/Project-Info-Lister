@@ -1,11 +1,12 @@
 ﻿using ProjectReferencesBuilder.Entities.Models;
+using ProjectReferencesBuilder.Helpers;
 using ProjectReferencesBuilder.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace ProjectReferencesBuilder.Helpers
+namespace ProjectReferencesBuilder.Services
 {
     public sealed class ProjectInfoService : IProjectInfoSetter
     {

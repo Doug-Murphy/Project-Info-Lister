@@ -1,16 +1,16 @@
 ﻿using ProjectReferencesBuilder.Entities.Models;
 using ProjectReferencesBuilder.Helpers;
+using ProjectReferencesBuilder.Services;
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
 
 namespace ProjectReferencesBuilder
 {
     class Program
     {
-        private static void PrintResults(IEnumerable<ProjectInfo> consolidatedData)
+        private static void PrintResults(ResultsOutput results)
         {
-            Console.WriteLine(JsonSerializer.Serialize(consolidatedData, new JsonSerializerOptions { WriteIndented = true }));
+            Console.WriteLine(JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true }));
         }
 
         static void Main(string[] args)
@@ -28,9 +28,16 @@ namespace ProjectReferencesBuilder
             }
 
             solutionFilePath = solutionFilePath.Trim('"');
-            var projectsWithInfo = ProjectInfoService.Start().WithName().WithReferences().WithTfm().GetInfo(solutionFilePath);
 
-            PrintResults(projectsWithInfo);
+            var projectsWithInfo = ProjectInfoService.Start().WithName().WithReferences().WithTfm().GetInfo(solutionFilePath);
+            var warningsForProjects = new WarningsService().GetWarnings(projectsWithInfo);
+            var finalOutput = new ResultsOutput
+            {
+                ProjectsWithInfo = projectsWithInfo,
+                Warnings = warningsForProjects
+            };
+
+            PrintResults(finalOutput);
         }
     }
 }
