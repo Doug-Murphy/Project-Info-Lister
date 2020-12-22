@@ -8,29 +8,27 @@ using System.Text.RegularExpressions;
 
 namespace ProjectReferencesBuilder.Services
 {
-    public sealed class ProjectInfoService : IProjectInfoSetter
+    public sealed class ProjectInfoService : IProjectInfoService
     {
         private bool _includeName;
         private bool _includeTfm;
         private bool _includeReferences;
 
-        public static IProjectInfoSetter Start() => new ProjectInfoService();
-
-        public IProjectInfoSetter WithName()
+        public IProjectInfoService WithName()
         {
             _includeName = true;
 
             return this;
         }
 
-        public IProjectInfoSetter WithReferences()
+        public IProjectInfoService WithReferences()
         {
             _includeReferences = true;
 
             return this;
         }
 
-        public IProjectInfoSetter WithTfm()
+        public IProjectInfoService WithTfm()
         {
             _includeTfm = true;
 

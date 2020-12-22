@@ -1,6 +1,11 @@
-﻿using ProjectReferencesBuilder.Entities.Models;
+﻿using Microsoft.Extensions.DependencyInjection;
+using ProjectReferencesBuilder.Entities.Models;
 using ProjectReferencesBuilder.Helpers;
+using ProjectReferencesBuilder.Helpers.Interface.WarningHelpers;
+using ProjectReferencesBuilder.Helpers.WarningHelpers;
+using ProjectReferencesBuilder.Interfaces;
 using ProjectReferencesBuilder.Services;
+using ProjectReferencesBuilder.Services.Interface;
 using System;
 using System.Text.Json;
 
@@ -15,6 +20,15 @@ namespace ProjectReferencesBuilder
 
         static void Main(string[] args)
         {
+            var serviceProvider = new ServiceCollection()
+                .AddSingleton<IEndOfLifeWarningHelper, EndOfLifeWarningHelper>()
+                .AddSingleton<IProjectInfoService, ProjectInfoService>()
+                .AddSingleton<IWarningsService, WarningsService>()
+                .BuildServiceProvider();
+
+            var projectInfoService = serviceProvider.GetService<IProjectInfoService>();
+            var warningsService = serviceProvider.GetService<IWarningsService>();
+
             string solutionFilePath = "";
             if (args.Length == 1)
             {
@@ -29,8 +43,8 @@ namespace ProjectReferencesBuilder
 
             solutionFilePath = solutionFilePath.Trim('"');
 
-            var projectsWithInfo = ProjectInfoService.Start().WithName().WithReferences().WithTfm().GetInfo(solutionFilePath);
-            var warningsForProjects = new WarningsService().GetWarnings(projectsWithInfo);
+            var projectsWithInfo = projectInfoService.WithName().WithReferences().WithTfm().GetInfo(solutionFilePath);
+            var warningsForProjects = warningsService.GetWarnings(projectsWithInfo);
             var finalOutput = new ResultsOutput
             {
                 ProjectsWithInfo = projectsWithInfo,

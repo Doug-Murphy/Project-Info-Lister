@@ -3,22 +3,22 @@ using System.Collections.Generic;
 
 namespace ProjectReferencesBuilder.Interfaces
 {
-    public interface IProjectInfoSetter
+    public interface IProjectInfoService
     {
         /// <summary>
         /// Specifies to include the name of the project in the information gathered.
         /// </summary>
-        IProjectInfoSetter WithName();
+        IProjectInfoService WithName();
 
         /// <summary>
         /// Specifies to include the references of the project in the information gathered.
         /// </summary>
-        IProjectInfoSetter WithReferences();
+        IProjectInfoService WithReferences();
 
         /// <summary>
         /// Specifies to include the TFM (target framework moniker) of the project in the information gathered.
         /// </summary>
-        IProjectInfoSetter WithTfm();
+        IProjectInfoService WithTfm();
 
         /// <summary>
         /// Execute the action to start the process.
