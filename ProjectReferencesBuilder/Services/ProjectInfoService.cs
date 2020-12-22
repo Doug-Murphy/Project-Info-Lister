@@ -1,6 +1,6 @@
 ﻿using ProjectReferencesBuilder.Entities.Models;
 using ProjectReferencesBuilder.Helpers;
-using ProjectReferencesBuilder.Interfaces;
+using ProjectReferencesBuilder.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.IO;

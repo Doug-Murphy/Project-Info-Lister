@@ -1,7 +1,7 @@
 ﻿using ProjectReferencesBuilder.Entities.Models;
 using System.Collections.Generic;
 
-namespace ProjectReferencesBuilder.Interfaces
+namespace ProjectReferencesBuilder.Services.Interface
 {
     public interface IProjectInfoService
     {
