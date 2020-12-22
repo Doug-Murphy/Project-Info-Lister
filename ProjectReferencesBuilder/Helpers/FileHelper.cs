@@ -26,5 +26,10 @@ namespace ProjectReferencesBuilder.Helpers
         {
             return Path.GetDirectoryName(filePath);
         }
+
+        public static string GetFileName(string filePath)
+        {
+            return Path.GetFileNameWithoutExtension(filePath);
+        }
     }
 }

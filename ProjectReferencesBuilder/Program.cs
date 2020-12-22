@@ -7,17 +7,29 @@ using ProjectReferencesBuilder.Interfaces;
 using ProjectReferencesBuilder.Services;
 using ProjectReferencesBuilder.Services.Interface;
 using System;
+using System.IO;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace ProjectReferencesBuilder
 {
     class Program
     {
-        private static void PrintResults(ResultsOutput results)
+        private static void WriteResultsToConsole(ResultsOutput results)
         {
             Console.WriteLine(JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true }));
         }
 
+        private static void WriteResultsToFile(string solutionFilePath, ResultsOutput finalOutput)
+        {
+            var solutionName = FileHelper.GetFileName(solutionFilePath);
+            var fileName = $"{solutionName}_{DateTime.Now}";
+            var invalidChars = new string(Path.GetInvalidFileNameChars());
+            var regExReplacer = new Regex($"[{Regex.Escape(invalidChars)}]");
+            fileName = regExReplacer.Replace(fileName, "_") + ".json";
+            File.WriteAllText(fileName, JsonSerializer.Serialize(finalOutput, new JsonSerializerOptions { WriteIndented = true }));
+        }
+ 
         static void Main(string[] args)
         {
             var serviceProvider = new ServiceCollection()
@@ -51,7 +63,8 @@ namespace ProjectReferencesBuilder
                 Warnings = warningsForProjects
             };
 
-            PrintResults(finalOutput);
+            // WriteResultsToConsole(finalOutput);
+            WriteResultsToFile(solutionFilePath, finalOutput);
         }
     }
 }
