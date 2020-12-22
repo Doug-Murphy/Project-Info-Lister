@@ -34,6 +34,7 @@ namespace ProjectReferencesBuilder
         {
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<IEndOfLifeWarningHelper, EndOfLifeWarningHelper>()
+                .AddSingleton<IProjectStyleWarningHelper, ProjectStyleWarningHelper>()
                 .AddSingleton<IProjectInfoService, ProjectInfoService>()
                 .AddSingleton<IWarningsService, WarningsService>()
                 .BuildServiceProvider();
@@ -63,7 +64,7 @@ namespace ProjectReferencesBuilder
                 Warnings = warningsForProjects
             };
 
-            // WriteResultsToConsole(finalOutput);
+            //WriteResultsToConsole(finalOutput);
             WriteResultsToFile(solutionFilePath, finalOutput);
         }
     }
