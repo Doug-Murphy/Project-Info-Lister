@@ -63,8 +63,8 @@ namespace ProjectReferencesBuilder
                 Warnings = warningsForProjects
             };
 
-            //WriteResultsToConsole(finalOutput);
-            WriteResultsToFile(solutionFilePath, finalOutput);
+            WriteResultsToConsole(finalOutput);
+            //WriteResultsToFile(solutionFilePath, finalOutput);
         }
     }
 }

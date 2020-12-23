@@ -3,9 +3,9 @@
 namespace ProjectReferencesBuilder.Entities.Enums
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum ProjectType
+    public enum WarningType
     {
-        Pre2017Style,
-        SDKStyle,
+        EndOfLife,
+        ProjectStyle
     }
 }

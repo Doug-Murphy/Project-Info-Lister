@@ -1,4 +1,5 @@
-﻿using ProjectReferencesBuilder.Entities.Models;
+﻿using ProjectReferencesBuilder.Entities.Enums;
+using ProjectReferencesBuilder.Entities.Models;
 using ProjectReferencesBuilder.Factories;
 using ProjectReferencesBuilder.Helpers.Interface.WarningHelpers;
 using ProjectReferencesBuilder.Services.Interface;
@@ -22,27 +23,39 @@ namespace ProjectReferencesBuilder.Services
         public List<Warning> GetWarnings(IEnumerable<ProjectInfo> projects)
         {
             var warningsFound = new List<Warning>();
+            var eolWarnings = new List<ProjectWarning>();
+            var projectStyleWarnings = new List<ProjectWarning>();
+
             foreach (var project in projects)
             {
-                var warningsForProject = new List<string>();
-
-                if (_endOfLifeWarningHelper.IsProjectTfmEndOfLife(project, out string warningMessage)) {
-                    warningsForProject.Add(warningMessage);
+                if (_endOfLifeWarningHelper.IsProjectTfmEndOfLife(project, out string warningMessage))
+                {
+                    eolWarnings.Add(new ProjectWarning
+                    {
+                        ProjectName = project.Name,
+                        Message = warningMessage
+                    });
                 }
 
                 if (_projectStyleWarningHelper.IsProjectUsingOldFormat(project))
                 {
-                    warningsForProject.Add(WarningMessageFactory.GetProjectStyleWarning());
-                }
-
-                if (warningsForProject.Any())
-                {
-                    warningsFound.Add(new Warning
+                    projectStyleWarnings.Add(new ProjectWarning
                     {
                         ProjectName = project.Name,
-                        Warnings = warningsForProject
+                        Message = WarningMessageFactory.GetProjectStyleWarning()
                     });
                 }
+
+            }
+
+            if (eolWarnings.Any())
+            {
+                warningsFound.AddRange(eolWarnings.Select(w => new Warning { WarningType = WarningType.EndOfLife, ProjectsAffected = eolWarnings }));
+            }
+
+            if (projectStyleWarnings.Any())
+            {
+                warningsFound.AddRange(projectStyleWarnings.Select(w => new Warning { WarningType = WarningType.ProjectStyle, ProjectsAffected = projectStyleWarnings }));
             }
 
             return warningsFound;

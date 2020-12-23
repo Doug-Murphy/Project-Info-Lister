@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using ProjectReferencesBuilder.Entities.Enums;
+using System.Collections.Generic;
 
 namespace ProjectReferencesBuilder.Entities.Models
 {
     public class Warning
     {
-        public string ProjectName { get; init; }
+        public WarningType WarningType { get; init; }
 
-        public List<string> Warnings { get; set; }
+        public List<ProjectWarning> ProjectsAffected { get; init; }
     }
 }

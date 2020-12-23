@@ -23,7 +23,6 @@ namespace ProjectReferencesBuilder.Entities.Models
         public string TFM { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public ProjectType? ProjectType { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
