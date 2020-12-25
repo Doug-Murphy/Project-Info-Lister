@@ -28,7 +28,7 @@ namespace ProjectReferencesBuilder.Helpers
 
         public static string GetFileExtension(string filePath)
         {
-            return Path.GetExtension(filePath.Trim('"'));
+            return Path.GetExtension(filePath?.Trim('"'));
         }
 
         public static string GetFileDirectory(string filePath)

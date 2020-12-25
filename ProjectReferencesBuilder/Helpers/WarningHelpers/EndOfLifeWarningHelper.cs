@@ -93,7 +93,6 @@ namespace ProjectReferencesBuilder.Helpers.WarningHelpers
                 return true;
             }
 
-            warningMessage = null;
             return false;
         }
     }
