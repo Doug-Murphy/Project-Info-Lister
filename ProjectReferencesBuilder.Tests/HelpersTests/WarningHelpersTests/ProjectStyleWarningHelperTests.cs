@@ -8,7 +8,7 @@ namespace ProjectReferencesBuilder.Tests.HelpersTests.WarningHelpersTests
 {
     public class ProjectStyleWarningHelperTests
     {
-        private const string _mockedAbsolutePath = @"\\dummy\absolute\path";
+        private const string _mockedAbsolutePath = @"dummy/absolute/path.csproj";
         private static IEnumerable<TestCaseData> TestIsProjectUsingOldFormat_TestCases
         {
             get

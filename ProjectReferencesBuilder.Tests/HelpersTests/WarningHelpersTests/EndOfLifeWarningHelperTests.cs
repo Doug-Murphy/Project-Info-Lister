@@ -8,7 +8,7 @@ namespace ProjectReferencesBuilder.Tests.HelpersTests.WarningHelpersTests
     [Parallelizable(ParallelScope.All)]
     public class EndOfLifeWarningHelperTests
     {
-        private const string _mockedAbsolutePath = @"\\dummy\absolute\path";
+        private const string _mockedAbsolutePath = @"dummy/absolute/path.csproj";
         private static IEnumerable<TestCaseData> TestIsProjectTfmEndOfLife_TestCases
         {
             get

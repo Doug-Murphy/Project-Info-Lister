@@ -9,16 +9,17 @@ namespace ProjectReferencesBuilder.Tests
     [Parallelizable(ParallelScope.All)]
     public class WarningMessageFactoryTests
     {
+        private const string _mockedAbsolutePath = @"\\dummy\absolute\path.sln";
         private static IEnumerable<TestCaseData> TestGetEndOfLifeWarning_TestCases
         {
             get
             {
-                var testProjectInfo = new ProjectInfo(@"\\dummy\absolute\path")
+                var testProjectInfo = new ProjectInfo(_mockedAbsolutePath)
                 {
                     TFM = "netcoreapp2.2"
                 };
 
-                yield return new TestCaseData(testProjectInfo, new DateTime(2020, 01, 02)).Returns("netcoreapp2.2 hit end of life on 1/2/2020. Please consider upgrading to a LTS or newer target framework.");
+                yield return new TestCaseData(testProjectInfo, new DateTime(2020, 01, 02)).Returns("netcoreapp2.2 hit end of life on January 02, 2020. Please consider upgrading to a LTS or newer target framework.");
             }
         }
         [TestCaseSource(nameof(TestGetEndOfLifeWarning_TestCases))]

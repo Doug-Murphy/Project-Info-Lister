@@ -7,7 +7,7 @@ namespace ProjectReferencesBuilder.Factories
     {
         public static string GetEndOfLifeWarning(ProjectInfo project, DateTime eolDate)
         {
-            return $"{project.TFM} hit end of life on {eolDate.ToShortDateString()}. Please consider upgrading to a LTS or newer target framework.";
+            return $"{project.TFM} hit end of life on {eolDate:MMMM dd, yyyy}. Please consider upgrading to a LTS or newer target framework.";
         }
 
         public static string GetProjectStyleWarning()

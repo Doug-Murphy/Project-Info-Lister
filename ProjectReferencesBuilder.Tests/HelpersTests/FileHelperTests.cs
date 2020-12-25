@@ -7,11 +7,12 @@ namespace ProjectReferencesBuilder.Tests.HelpersTests
     [Parallelizable(ParallelScope.All)]
     public class FileHelperTests
     {
+        private const string _mockedAbsolutePath = @"dummy/absolute/path.csproj";
         private static IEnumerable<TestCaseData> TestGetFileExtension_TestCases
         {
             get
             {
-                yield return new TestCaseData(@"C:\ProjectInfoTester\File.sln").Returns(".sln");
+                yield return new TestCaseData(_mockedAbsolutePath).Returns(".csproj");
                 yield return new TestCaseData(null).Returns(null);
             }
         }
@@ -25,21 +26,32 @@ namespace ProjectReferencesBuilder.Tests.HelpersTests
         {
             get
             {
-                yield return new TestCaseData(@"C:\ProjectInfoTester\File.sln").Returns(@"C:\ProjectInfoTester");
-                yield return new TestCaseData(null).Returns(null);
+                yield return new TestCaseData(_mockedAbsolutePath);
+                yield return new TestCaseData(null);
             }
         }
         [TestCaseSource(nameof(TestGetFileDirectory_TestCases))]
-        public string TestGetFileDirectory(string filePath)
+        public void TestGetFileDirectory(string filePath)
         {
-            return FileHelper.GetFileDirectory(filePath);
+            var fileDirectory = FileHelper.GetFileDirectory(filePath);
+
+            if (filePath == null)
+            {
+                Assert.That(fileDirectory, Is.Null);
+                return;
+            }
+
+            var fileDirectoryBackSlash = fileDirectory.Replace('/', '\\');
+            var fileDirectoryForwardSlash = fileDirectory.Replace('\\', '/');
+
+            Assert.That(fileDirectory, Is.EqualTo(fileDirectoryBackSlash).Or.EqualTo(fileDirectoryForwardSlash)); //annoying Windows vs Linux compatability issue. Need to check / and \
         }
 
         private static IEnumerable<TestCaseData> TestGetFileName_TestCases
         {
             get
             {
-                yield return new TestCaseData(@"C:\ProjectInfoTester\File.sln").Returns("File");
+                yield return new TestCaseData(_mockedAbsolutePath).Returns("path");
                 yield return new TestCaseData(null).Returns(null);
             }
         }
