@@ -1,8 +1,8 @@
 ﻿using NUnit.Framework;
 using ProjectReferencesBuilder.Entities.Enums;
+using ProjectReferencesBuilder.Helpers;
 using ProjectReferencesBuilder.Services;
 using System;
-using System.IO;
 using System.Linq;
 
 namespace ProjectReferencesBuilder.Tests.ServicesTests
@@ -10,7 +10,7 @@ namespace ProjectReferencesBuilder.Tests.ServicesTests
     public class ProjectInfoServiceTests
     {
         private const string _pathToSampleProjectsSolution = "../../../../SampleProjects/SampleProjects.sln";
-        private readonly string _absolutePathToSampleProjectsSolution = Path.GetFullPath(_pathToSampleProjectsSolution);
+        private readonly string _absolutePathToSampleProjectsSolution = PathHelper.GetAbsolutePath(_pathToSampleProjectsSolution);
 
         [Test]
         public void TestGettingProjectName()
