@@ -50,7 +50,7 @@ namespace ProjectReferencesBuilder.Services
 
             for (int i = 0; i < projectLineMatches.Count; i++)
             {
-                var fullyQualifiedPath = Path.GetFullPath(projectLineMatches[i].Groups[2].Value.Replace('\\', '/'), FileHelper.GetFileDirectory(solutionFilePath));
+                var fullyQualifiedPath = Path.GetFullPath(projectLineMatches[i].Groups[2].Value, FileHelper.GetFileDirectory(solutionFilePath)).Replace('\\', '/');
                 projectsInSolution.Add(new ProjectInfo(fullyQualifiedPath));
             }
 
