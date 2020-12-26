@@ -103,7 +103,7 @@ namespace ProjectReferencesBuilder.Helpers
 
                     foreach (XmlNode item in projectFileXmlDocument.SelectNodes("//x:ProjectReference", xmlManager))
                     {
-                        var referencedProjectInfo = new ProjectInfo(Path.GetFullPath(item.Attributes["Include"].Value, FileHelper.GetFileDirectory(projectInfo.AbsolutePath)));
+                        var referencedProjectInfo = new ProjectInfo(PathHelper.GetAbsolutePath(item.Attributes["Include"].Value, FileHelper.GetFileDirectory(projectInfo.AbsolutePath)));
                         SetProjectInfo(referencedProjectInfo);
                         projectInfo.ProjectsReferenced.Add(referencedProjectInfo);
                     }
@@ -111,7 +111,7 @@ namespace ProjectReferencesBuilder.Helpers
                 case ProjectType.SDKStyle:
                     foreach (XmlNode item in projectFileXmlDocument.SelectNodes("Project/ItemGroup/ProjectReference", xmlManager))
                     {
-                        var referencedProjectInfo = new ProjectInfo(Path.GetFullPath(item.Attributes["Include"].Value, FileHelper.GetFileDirectory(projectInfo.AbsolutePath)));
+                        var referencedProjectInfo = new ProjectInfo(PathHelper.GetAbsolutePath(item.Attributes["Include"].Value, FileHelper.GetFileDirectory(projectInfo.AbsolutePath)));
                         SetProjectInfo(referencedProjectInfo);
                         projectInfo.ProjectsReferenced.Add(referencedProjectInfo);
                     }
