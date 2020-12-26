@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ServicesTests\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ProjectReferencesBuilder\ProjectReferencesBuilder.csproj" />
   </ItemGroup>
 
