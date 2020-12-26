@@ -11,3 +11,8 @@ updates:
       interval: "daily"
     reviewers:
       - "Doug-Murphy"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
