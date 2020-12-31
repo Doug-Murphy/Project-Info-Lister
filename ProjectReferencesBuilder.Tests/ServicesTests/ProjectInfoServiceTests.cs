@@ -1,8 +1,10 @@
 ﻿using NUnit.Framework;
 using ProjectReferencesBuilder.Entities.Enums;
+using ProjectReferencesBuilder.Entities.Models;
 using ProjectReferencesBuilder.Helpers;
 using ProjectReferencesBuilder.Services;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ProjectReferencesBuilder.Tests.ServicesTests
@@ -95,6 +97,29 @@ namespace ProjectReferencesBuilder.Tests.ServicesTests
             {
                 Assert.That(project.TFM, Is.Not.Null);
             }
+        }
+
+        [Test]
+        public void TestSolutionNotEndingInSln()
+        {
+            string invalidPathToSampleProjectsSolution = "../../../../SampleProjects/SampleProjects.notsln";
+            string invalidAbsolutePathToSampleProjectsSolution = PathHelper.GetAbsolutePath(invalidPathToSampleProjectsSolution);
+
+            Assert.Throws<ArgumentException>(() => { var projectInfo = new ProjectInfoService().WithTfm().GetInfo(invalidAbsolutePathToSampleProjectsSolution); });
+        }
+
+        [Test]
+        public void TestAddingTwoProjectInfoObjectsResultsInOne()
+        {
+            var projectInfo1 = new ProjectInfo("not_necessary");
+            var projectInfo2 = new ProjectInfo("not_necessary");
+
+            var projectsInSolution = new HashSet<ProjectInfo>(new ProjectInfoComparer());
+
+            projectsInSolution.Add(projectInfo1);
+            projectsInSolution.Add(projectInfo2);
+
+            Assert.That(projectsInSolution.Count, Is.EqualTo(1));
         }
     }
 }
