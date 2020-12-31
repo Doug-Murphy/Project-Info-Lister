@@ -3,7 +3,6 @@ using ProjectReferencesBuilder.Helpers;
 using ProjectReferencesBuilder.Services.Interface;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 
 namespace ProjectReferencesBuilder.Services
@@ -45,7 +44,7 @@ namespace ProjectReferencesBuilder.Services
             var fileContents = FileHelper.GetFileContents(solutionFilePath);
             var projectLineRegEx = new Regex(@"Project\(""\{.*\}""\).*""(.*)"",.*""(.*.csproj)", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
             var projectLineMatches = projectLineRegEx.Matches(string.Join("\n", fileContents));
-            var projectsInSolution = new HashSet<ProjectInfo>();
+            var projectsInSolution = new HashSet<ProjectInfo>(new ProjectInfoComparer());
             var projectInfoHelper = new ProjectInfoHelper(_includeName, _includeReferences, _includeTfm);
 
             for (int i = 0; i < projectLineMatches.Count; i++)

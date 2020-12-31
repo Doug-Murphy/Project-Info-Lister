@@ -33,12 +33,12 @@ namespace ProjectReferencesBuilder.Entities.Models
     {
         public bool Equals([DisallowNull] ProjectInfo x, [DisallowNull] ProjectInfo y)
         {
-            return x.Name == y.Name;
+            return x.AbsolutePath == y.AbsolutePath;
         }
 
         public int GetHashCode([DisallowNull] ProjectInfo obj)
         {
-            return StringComparer.InvariantCultureIgnoreCase.GetHashCode(obj.Name);
+            return obj.AbsolutePath.GetHashCode();
         }
     }
 }

@@ -87,7 +87,7 @@ namespace ProjectReferencesBuilder.Helpers.WarningHelpers
                 return false;
             }
 
-            if (eolDate.HasValue && eolDate < DateTime.Now.Date)
+            if (eolDate < DateTime.Now.Date)
             {
                 warningMessage = WarningMessageFactory.GetEndOfLifeWarning(project, eolDate.Value);
                 return true;
