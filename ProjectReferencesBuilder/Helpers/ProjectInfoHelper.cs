@@ -25,6 +25,11 @@ namespace ProjectReferencesBuilder.Helpers
 
         public void SetProjectInfo(ProjectInfo projectToSetInfoFor)
         {
+            if (FileHelper.GetFileExtension(projectToSetInfoFor.AbsolutePath) != ".csproj")
+            {
+                throw new ArgumentException("This file is not a .csproj file.", nameof(projectToSetInfoFor));
+            }
+
             SetProjectType(projectToSetInfoFor);
             if (_includeName)
             {
@@ -47,11 +52,6 @@ namespace ProjectReferencesBuilder.Helpers
 
         private void SetProjectType(ProjectInfo projectInfo)
         {
-            if (FileHelper.GetFileExtension(projectInfo.AbsolutePath) != ".csproj")
-            {
-                throw new ArgumentException("This file is not a .csproj file.", nameof(projectInfo));
-            }
-
             var fileContents = FileHelper.GetFileContents(projectInfo.AbsolutePath);
 
             if (fileContents.Any(x => x.StartsWith("<Project Sdk=")))
@@ -85,8 +85,6 @@ namespace ProjectReferencesBuilder.Helpers
                         projectInfo.TFM = item.InnerXml;
                     }
                     break;
-                default:
-                    throw new NotSupportedException("How did you get here?");
             }
         }
 
@@ -116,8 +114,6 @@ namespace ProjectReferencesBuilder.Helpers
                         projectInfo.ProjectsReferenced.Add(referencedProjectInfo);
                     }
                     break;
-                default:
-                    throw new NotSupportedException("How did you get here?");
             }
         }
 
