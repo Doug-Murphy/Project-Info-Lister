@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using ProjectReferencesBuilder.Helpers;
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace ProjectReferencesBuilder.Tests.HelpersTests
 {
@@ -60,6 +62,13 @@ namespace ProjectReferencesBuilder.Tests.HelpersTests
         public string TestGetFileName(string filePath)
         {
             return FileHelper.GetFileName(filePath);
+        }
+
+        [Test]
+        public void TestEmptyFileThrowsException()
+        {
+            var emptyFilePath = Path.GetTempFileName();
+            Assert.Throws<InvalidOperationException>(() => { FileHelper.GetFileContents(emptyFilePath); });
         }
     }
 }

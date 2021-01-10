@@ -16,7 +16,7 @@ namespace ProjectReferencesBuilder.Helpers
             }
 
             var fileContents = File.ReadAllLines(filePath);
-            if (fileContents == null || fileContents.Length == 0)
+            if (fileContents.Length == 0)
             {
                 throw new InvalidOperationException("The project file path is an empty file.");
             }
