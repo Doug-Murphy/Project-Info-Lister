@@ -2,7 +2,6 @@
 using ProjectReferencesBuilder.Helpers;
 using ProjectReferencesBuilder.Helpers.WarningHelpers;
 using ProjectReferencesBuilder.Services;
-using System;
 using System.IO;
 using System.Reflection;
 
@@ -42,9 +41,8 @@ namespace ProjectReferencesBuilder.Tests.ServicesTests
             Assert.DoesNotThrow(() => { runnerService.WriteResultsToFile(_absolutePathToSampleProjectsSolution, results); });
 
             //cleanup written files
-            var executingAssemblyLocation = Assembly.GetExecutingAssembly().Location;
-            UriBuilder uri = new UriBuilder(executingAssemblyLocation);
-            var executingAssemblyDirectory = new DirectoryInfo(Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path)));
+            var executingAssemblyPath = Assembly.GetExecutingAssembly().Location;
+            var executingAssemblyDirectory = new DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath));
 
             foreach (var sampleOutputFile in executingAssemblyDirectory.EnumerateFiles($"{solutionFileName}*.json")) {
                 sampleOutputFile.Delete();
