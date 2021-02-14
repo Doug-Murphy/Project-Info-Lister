@@ -1,13 +1,12 @@
-﻿using ProjectReferencesBuilder.Entities.Models;
-using System;
+﻿using System;
 
 namespace ProjectReferencesBuilder.Factories
 {
     public static class WarningMessageFactory
     {
-        public static string GetEndOfLifeWarning(ProjectInfo project, DateTime eolDate)
+        public static string GetEndOfLifeWarning(string projectTfm, DateTime eolDate)
         {
-            return $"{project.TFM} hit end of life on {eolDate:MMMM dd, yyyy}. Please consider upgrading to a LTS or newer target framework.";
+            return $"{projectTfm} hit end of life on {eolDate:MMMM dd, yyyy}. Please consider upgrading to a LTS or newer target framework.";
         }
 
         public static string GetProjectStyleWarning()

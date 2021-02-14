@@ -14,6 +14,7 @@ namespace ProjectReferencesBuilder.Tests.HelpersTests.WarningHelpersTests
             get
             {
                 yield return new TestCaseData(new ProjectInfo(_mockedAbsolutePath) { TFM = "netcoreapp2.2" }).Returns(true);
+                yield return new TestCaseData(new ProjectInfo(_mockedAbsolutePath) { TFM = "netcoreapp2.2;netcoreapp3.1" }).Returns(true);
                 yield return new TestCaseData(new ProjectInfo(_mockedAbsolutePath) { TFM = "net5.0" }).Returns(false);
                 yield return new TestCaseData(new ProjectInfo(_mockedAbsolutePath) { TFM = "unsupported_TFM" }).Returns(false);
             }

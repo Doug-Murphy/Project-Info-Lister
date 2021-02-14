@@ -25,7 +25,7 @@ namespace ProjectReferencesBuilder.Tests
         [TestCaseSource(nameof(TestGetEndOfLifeWarning_TestCases))]
         public string TestGetEndOfLifeWarning(ProjectInfo testProjectInfo, DateTime eolDate)
         {
-            return WarningMessageFactory.GetEndOfLifeWarning(testProjectInfo, eolDate);
+            return WarningMessageFactory.GetEndOfLifeWarning(testProjectInfo.TFM, eolDate);
         }
 
         [Test]
