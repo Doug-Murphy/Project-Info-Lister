@@ -4,6 +4,7 @@ using ProjectReferencesBuilder.Helpers.Interface.WarningHelpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace ProjectReferencesBuilder.Helpers.WarningHelpers
 {
@@ -81,19 +82,25 @@ namespace ProjectReferencesBuilder.Helpers.WarningHelpers
 
         public bool IsProjectTfmEndOfLife(ProjectInfo project, out string warningMessage)
         {
-            warningMessage = null;
-            if (!_targetFrameworksWithEndOfLifeDate.TryGetValue(project.TFM, out DateTime? eolDate))
+            List<string> eolWarnings = new List<string>();
+            foreach (var tfm in project.TFM.Split(';', StringSplitOptions.RemoveEmptyEntries))
             {
-                return false;
+                if (_targetFrameworksWithEndOfLifeDate.TryGetValue(tfm, out DateTime? eolDate) && eolDate < DateTime.Now.Date)
+                {
+                    eolWarnings.Add(WarningMessageFactory.GetEndOfLifeWarning(tfm, eolDate.Value));
+                }
             }
 
-            if (eolDate < DateTime.Now.Date)
+            if (eolWarnings.Any())
             {
-                warningMessage = WarningMessageFactory.GetEndOfLifeWarning(project, eolDate.Value);
-                return true;
+                warningMessage = string.Join(" ", eolWarnings);
+            }
+            else
+            {
+                warningMessage = null;
             }
 
-            return false;
+            return !string.IsNullOrWhiteSpace(warningMessage);
         }
     }
 }
