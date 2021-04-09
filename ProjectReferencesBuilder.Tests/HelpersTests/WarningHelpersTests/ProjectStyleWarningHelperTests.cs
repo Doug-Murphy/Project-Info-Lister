@@ -1,30 +1,29 @@
-﻿using NUnit.Framework;
-using ProjectReferencesBuilder.Entities.Enums;
+﻿using ProjectReferencesBuilder.Entities.Enums;
 using ProjectReferencesBuilder.Entities.Models;
 using ProjectReferencesBuilder.Helpers.WarningHelpers;
 using System.Collections.Generic;
+using Xunit;
 
 namespace ProjectReferencesBuilder.Tests.HelpersTests.WarningHelpersTests
 {
     public class ProjectStyleWarningHelperTests
     {
         private const string _mockedAbsolutePath = @"dummy/absolute/path.csproj";
-        private static IEnumerable<TestCaseData> TestIsProjectUsingOldFormat_TestCases
+        public static IEnumerable<object[]> TestIsProjectUsingOldFormat_TestCases()
         {
-            get
-            {
-                yield return new TestCaseData(new ProjectInfo(_mockedAbsolutePath) { ProjectType = ProjectType.Pre2017Style }).Returns(true);
-                yield return new TestCaseData(new ProjectInfo(_mockedAbsolutePath) { ProjectType = ProjectType.SDKStyle }).Returns(false);
-                yield return new TestCaseData(new ProjectInfo(_mockedAbsolutePath) { ProjectType = null }).Returns(false);
-            }
+            yield return new object[] { true, new ProjectInfo(_mockedAbsolutePath) { ProjectType = ProjectType.Pre2017Style } };
+            yield return new object[] { false, new ProjectInfo(_mockedAbsolutePath) { ProjectType = ProjectType.SDKStyle } };
+            yield return new object[] { false, new ProjectInfo(_mockedAbsolutePath) { ProjectType = null } };
         }
-        [TestCaseSource(nameof(TestIsProjectUsingOldFormat_TestCases))]
-        public bool TestIsProjectUsingOldFormat(ProjectInfo project)
+
+        [Theory]
+        [MemberData(nameof(TestIsProjectUsingOldFormat_TestCases))]
+        public void TestIsProjectUsingOldFormat(bool expectedResult, ProjectInfo project)
         {
             var mockProjectStyleWarningHelper = new ProjectStyleWarningHelper();
             var isOldFormat = mockProjectStyleWarningHelper.IsProjectUsingOldFormat(project);
 
-            return isOldFormat;
+            Assert.Equal(expectedResult, isOldFormat);
         }
     }
 }
