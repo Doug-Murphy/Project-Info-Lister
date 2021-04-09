@@ -1,11 +1,12 @@
-﻿using NUnit.Framework;
-using ProjectReferencesBuilder.Entities.Enums;
+﻿using ProjectReferencesBuilder.Entities.Enums;
 using ProjectReferencesBuilder.Entities.Models;
 using ProjectReferencesBuilder.Helpers;
 using ProjectReferencesBuilder.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Xunit;
+using Xunit.Sdk;
 
 namespace ProjectReferencesBuilder.Tests.ServicesTests
 {
@@ -14,18 +15,18 @@ namespace ProjectReferencesBuilder.Tests.ServicesTests
         private const string _pathToSampleProjectsSolution = "../../../../SampleProjects/SampleProjects.sln";
         private readonly string _absolutePathToSampleProjectsSolution = PathHelper.GetAbsolutePath(_pathToSampleProjectsSolution);
 
-        [Test]
+        [Fact]
         public void TestGettingProjectName()
         {
             var projectInfo = new ProjectInfoService().WithName().GetInfo(_absolutePathToSampleProjectsSolution);
 
             foreach (var project in projectInfo)
             {
-                Assert.That(project.Name, Is.Not.Null);
+                Assert.NotNull(project.Name);
             }
         }
 
-        [Test]
+        [Fact]
         public void TestGettingProjectReferences()
         {
             var projectInfo = new ProjectInfoService().WithName().WithReferences().GetInfo(_absolutePathToSampleProjectsSolution);
@@ -35,42 +36,42 @@ namespace ProjectReferencesBuilder.Tests.ServicesTests
                 switch (project.Name)
                 {
                     case "ConsoleApp1":
-                        CollectionAssert.IsNotEmpty(project.ProjectsReferenced);
-                        Assert.That(project.ProjectsReferenced.Count, Is.EqualTo(1));
-                        Assert.That(project.ProjectsReferenced.First().Name, Is.EqualTo("Services"));
+                        Assert.NotEmpty(project.ProjectsReferenced);
+                        Assert.Equal(1, project.ProjectsReferenced.Count);
+                        Assert.Equal("Services", project.ProjectsReferenced.First().Name);
                         break;
                     case "Entities":
-                        CollectionAssert.IsNotEmpty(project.ProjectsReferenced);
-                        Assert.That(project.ProjectsReferenced.Count, Is.EqualTo(1));
-                        Assert.That(project.ProjectsReferenced.First().Name, Is.EqualTo("Entities.Interface"));
+                        Assert.NotEmpty(project.ProjectsReferenced);
+                        Assert.Equal(1, project.ProjectsReferenced.Count);
+                        Assert.Equal("Entities.Interface", project.ProjectsReferenced.First().Name);
                         break;
                     case "Entities.Interface":
-                        CollectionAssert.IsEmpty(project.ProjectsReferenced);
+                        Assert.Empty(project.ProjectsReferenced);
                         break;
                     case "OldStyle":
-                        CollectionAssert.IsNotEmpty(project.ProjectsReferenced);
-                        Assert.That(project.ProjectsReferenced.Count, Is.EqualTo(2));
-                        Assert.That(project.ProjectsReferenced.First().Name, Is.EqualTo("Entities"));
+                        Assert.NotEmpty(project.ProjectsReferenced);
+                        Assert.Equal(2, project.ProjectsReferenced.Count);
+                        Assert.Equal("Entities", project.ProjectsReferenced.First().Name);
                         break;
                     case "Services":
-                        CollectionAssert.IsNotEmpty(project.ProjectsReferenced);
-                        Assert.That(project.ProjectsReferenced.Count, Is.EqualTo(2));
-                        Assert.That(project.ProjectsReferenced.First().Name, Is.EqualTo("Entities"));
+                        Assert.NotEmpty(project.ProjectsReferenced);
+                        Assert.Equal(2, project.ProjectsReferenced.Count);
+                        Assert.Equal("Entities", project.ProjectsReferenced.First().Name);
                         break;
                     case "Services.Interface":
-                        CollectionAssert.IsEmpty(project.ProjectsReferenced);
+                        Assert.Empty(project.ProjectsReferenced);
                         break;
                     case "EndOfLifeSample":
-                        CollectionAssert.IsEmpty(project.ProjectsReferenced);
+                        Assert.Empty(project.ProjectsReferenced);
                         break;
                     default:
-                        Assert.Fail(); //unexpected project found, fail to raise suspicion
+                        throw new XunitException($"An unexpected project was found.");
                         break;
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public void TestGettingProjectStyle()
         {
             var projectInfo = new ProjectInfoService().WithName().GetInfo(_absolutePathToSampleProjectsSolution);
@@ -79,27 +80,27 @@ namespace ProjectReferencesBuilder.Tests.ServicesTests
             {
                 if (string.Equals(project.Name, "OldStyle", StringComparison.OrdinalIgnoreCase))
                 {
-                    Assert.That(project.ProjectType, Is.EqualTo(ProjectType.Pre2017Style));
+                    Assert.Equal(ProjectType.Pre2017Style, project.ProjectType);
                 }
                 else
                 {
-                    Assert.That(project.ProjectType, Is.EqualTo(ProjectType.SDKStyle));
+                    Assert.Equal(ProjectType.SDKStyle, project.ProjectType);
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public void TestGettingProjectTfm()
         {
             var projectInfo = new ProjectInfoService().WithTfm().GetInfo(_absolutePathToSampleProjectsSolution);
 
             foreach (var project in projectInfo)
             {
-                Assert.That(project.TFM, Is.Not.Null);
+                Assert.NotNull(project.TFM);
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSolutionNotEndingInSln()
         {
             string invalidPathToSampleProjectsSolution = "../../../../SampleProjects/SampleProjects.notsln";
@@ -108,7 +109,7 @@ namespace ProjectReferencesBuilder.Tests.ServicesTests
             Assert.Throws<ArgumentException>(() => { var projectInfo = new ProjectInfoService().WithTfm().GetInfo(invalidAbsolutePathToSampleProjectsSolution); });
         }
 
-        [Test]
+        [Fact]
         public void TestAddingTwoProjectInfoObjectsResultsInOne()
         {
             var projectInfo1 = new ProjectInfo("not_necessary");
@@ -119,7 +120,7 @@ namespace ProjectReferencesBuilder.Tests.ServicesTests
             projectsInSolution.Add(projectInfo1);
             projectsInSolution.Add(projectInfo2);
 
-            Assert.That(projectsInSolution.Count, Is.EqualTo(1));
+            Assert.Equal(1, projectsInSolution.Count);
         }
     }
 }

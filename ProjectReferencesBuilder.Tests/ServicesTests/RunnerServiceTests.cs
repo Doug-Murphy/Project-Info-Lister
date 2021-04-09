@@ -1,9 +1,9 @@
-﻿using NUnit.Framework;
-using ProjectReferencesBuilder.Helpers;
+﻿using ProjectReferencesBuilder.Helpers;
 using ProjectReferencesBuilder.Helpers.WarningHelpers;
 using ProjectReferencesBuilder.Services;
 using System.IO;
 using System.Reflection;
+using Xunit;
 
 namespace ProjectReferencesBuilder.Tests.ServicesTests
 {
@@ -12,7 +12,7 @@ namespace ProjectReferencesBuilder.Tests.ServicesTests
         private const string _pathToSampleProjectsSolution = "../../../../SampleProjects/SampleProjects.sln";
         private readonly string _absolutePathToSampleProjectsSolution = PathHelper.GetAbsolutePath(_pathToSampleProjectsSolution);
 
-        [Test]
+        [Fact]
         public void TestWriteResultsToConsole()
         {
             var mockedEndOfLifeWarningHelper = new EndOfLifeWarningHelper();
@@ -23,10 +23,10 @@ namespace ProjectReferencesBuilder.Tests.ServicesTests
 
             var results = runnerService.GetProjectDetails(_absolutePathToSampleProjectsSolution);
 
-            Assert.DoesNotThrow(() => { runnerService.WriteResultsToConsole(results); });
+            runnerService.WriteResultsToConsole(results);
         }
 
-        [Test]
+        [Fact]
         public void TestWriteResultsToFile()
         {
             var mockedEndOfLifeWarningHelper = new EndOfLifeWarningHelper();
@@ -38,7 +38,7 @@ namespace ProjectReferencesBuilder.Tests.ServicesTests
             var results = runnerService.GetProjectDetails(_absolutePathToSampleProjectsSolution);
             var solutionFileName = FileHelper.GetFileName(_absolutePathToSampleProjectsSolution);
 
-            Assert.DoesNotThrow(() => { runnerService.WriteResultsToFile(_absolutePathToSampleProjectsSolution, results); });
+            runnerService.WriteResultsToFile(_absolutePathToSampleProjectsSolution, results);
 
             //cleanup written files
             var executingAssemblyPath = Assembly.GetExecutingAssembly().Location;
