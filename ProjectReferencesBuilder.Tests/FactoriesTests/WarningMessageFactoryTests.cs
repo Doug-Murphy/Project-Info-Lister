@@ -1,37 +1,34 @@
-using NUnit.Framework;
 using ProjectReferencesBuilder.Entities.Models;
 using ProjectReferencesBuilder.Factories;
 using System;
 using System.Collections.Generic;
+using Xunit;
 
 namespace ProjectReferencesBuilder.Tests
 {
-    [Parallelizable(ParallelScope.All)]
     public class WarningMessageFactoryTests
     {
         private const string _mockedAbsolutePath = @"\\dummy\absolute\path.sln";
-        private static IEnumerable<TestCaseData> TestGetEndOfLifeWarning_TestCases
+        public static IEnumerable<object[]> TestGetEndOfLifeWarning_TestCases()
         {
-            get
+            var testProjectInfo = new ProjectInfo(_mockedAbsolutePath)
             {
-                var testProjectInfo = new ProjectInfo(_mockedAbsolutePath)
-                {
-                    TFM = "netcoreapp2.2"
-                };
+                TFM = "netcoreapp2.2"
+            };
 
-                yield return new TestCaseData(testProjectInfo, new DateTime(2020, 01, 02)).Returns("netcoreapp2.2 hit end of life on January 02, 2020. Please consider upgrading to a LTS or newer target framework.");
-            }
+            yield return new object[] { "netcoreapp2.2 hit end of life on January 02, 2020. Please consider upgrading to a LTS or newer target framework.", testProjectInfo, new DateTime(2020, 01, 02) };
         }
-        [TestCaseSource(nameof(TestGetEndOfLifeWarning_TestCases))]
-        public string TestGetEndOfLifeWarning(ProjectInfo testProjectInfo, DateTime eolDate)
+        [Theory]
+        [MemberData(nameof(TestGetEndOfLifeWarning_TestCases))]
+        public void TestGetEndOfLifeWarning(string expectedResult, ProjectInfo testProjectInfo, DateTime eolDate)
         {
-            return WarningMessageFactory.GetEndOfLifeWarning(testProjectInfo.TFM, eolDate);
+            Assert.Equal(expectedResult, WarningMessageFactory.GetEndOfLifeWarning(testProjectInfo.TFM, eolDate));
         }
 
-        [Test]
+        [Fact]
         public void TestGetProjectStyleWarning()
         {
-            Assert.That(WarningMessageFactory.GetProjectStyleWarning(), Is.EqualTo("The project style for this project is outdated and has many drawbacks compared to the SDK-style csproj. Please consider upgrading it."));
+            Assert.Equal("The project style for this project is outdated and has many drawbacks compared to the SDK-style csproj. Please consider upgrading it.", WarningMessageFactory.GetProjectStyleWarning());
         }
     }
 }
