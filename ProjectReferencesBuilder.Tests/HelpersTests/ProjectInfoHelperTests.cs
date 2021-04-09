@@ -1,14 +1,13 @@
-﻿using NUnit.Framework;
-using ProjectReferencesBuilder.Entities.Models;
+﻿using ProjectReferencesBuilder.Entities.Models;
 using ProjectReferencesBuilder.Helpers;
 using System;
+using Xunit;
 
 namespace ProjectReferencesBuilder.Tests.HelpersTests
 {
-    [Parallelizable(ParallelScope.All)]
     public class ProjectInfoHelperTests
     {
-        [Test]
+        [Fact]
         public void SetProjectInfoInvalidFileExtensionTest()
         {
             var projectWithInvalidFileExtension = new ProjectInfo("foo.notcsproj");
