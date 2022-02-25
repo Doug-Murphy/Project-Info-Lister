@@ -3,27 +3,26 @@ using ProjectReferencesBuilder.Helpers.WarningHelpers;
 using System.Collections.Generic;
 using Xunit;
 
-namespace ProjectReferencesBuilder.Tests.HelpersTests.WarningHelpersTests
+namespace ProjectReferencesBuilder.Tests.HelpersTests.WarningHelpersTests;
+
+public class EndOfLifeWarningHelperTests
 {
-    public class EndOfLifeWarningHelperTests
+    private const string _mockedAbsolutePath = @"dummy/absolute/path.csproj";
+    public static IEnumerable<object[]> TestIsProjectTfmEndOfLife_TestCases()
     {
-        private const string _mockedAbsolutePath = @"dummy/absolute/path.csproj";
-        public static IEnumerable<object[]> TestIsProjectTfmEndOfLife_TestCases()
-        {
-            yield return new object[] { true, new ProjectInfo(_mockedAbsolutePath) { TFM = "netcoreapp2.2" } };
-            yield return new object[] { true, new ProjectInfo(_mockedAbsolutePath) { TFM = "netcoreapp2.2;netcoreapp3.1" } };
-            yield return new object[] { false, new ProjectInfo(_mockedAbsolutePath) { TFM = "net5.0" } };
-            yield return new object[] { false, new ProjectInfo(_mockedAbsolutePath) { TFM = "unsupported_TFM" } };
-        }
+        yield return new object[] { true, new ProjectInfo(_mockedAbsolutePath) { TFM = "netcoreapp2.2" } };
+        yield return new object[] { true, new ProjectInfo(_mockedAbsolutePath) { TFM = "netcoreapp2.2;netcoreapp3.1" } };
+        yield return new object[] { false, new ProjectInfo(_mockedAbsolutePath) { TFM = "net5.0" } };
+        yield return new object[] { false, new ProjectInfo(_mockedAbsolutePath) { TFM = "unsupported_TFM" } };
+    }
 
-        [Theory]
-        [MemberData(nameof(TestIsProjectTfmEndOfLife_TestCases))]
-        public void TestIsProjectTfmEndOfLife(bool expectedResult, ProjectInfo project)
-        {
-            var mockEndOfLifeWarningHelper = new EndOfLifeWarningHelper();
-            var isEol = mockEndOfLifeWarningHelper.IsProjectTfmEndOfLife(project, out string _);
+    [Theory]
+    [MemberData(nameof(TestIsProjectTfmEndOfLife_TestCases))]
+    public void TestIsProjectTfmEndOfLife(bool expectedResult, ProjectInfo project)
+    {
+        var mockEndOfLifeWarningHelper = new EndOfLifeWarningHelper();
+        var isEol = mockEndOfLifeWarningHelper.IsProjectTfmEndOfLife(project, out string _);
 
-            Assert.Equal(expectedResult, isEol);
-        }
+        Assert.Equal(expectedResult, isEol);
     }
 }

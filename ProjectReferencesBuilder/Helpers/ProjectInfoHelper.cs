@@ -1,128 +1,123 @@
 ﻿using ProjectReferencesBuilder.Entities.Enums;
 using ProjectReferencesBuilder.Entities.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Xml;
 
-namespace ProjectReferencesBuilder.Helpers
+namespace ProjectReferencesBuilder.Helpers;
+
+public sealed class ProjectInfoHelper
 {
-    public sealed class ProjectInfoHelper
+    private readonly bool _includeName;
+    private readonly bool _includeReferences;
+    private readonly bool _includeTfm;
+
+    public ProjectInfoHelper(bool includeName,
+        bool includeReferences,
+        bool includeTfm)
     {
-        private readonly bool _includeName;
-        private readonly bool _includeReferences;
-        private readonly bool _includeTfm;
+        _includeName = includeName;
+        _includeReferences = includeReferences;
+        _includeTfm = includeTfm;
+    }
 
-        public ProjectInfoHelper(bool includeName,
-                                 bool includeReferences,
-                                 bool includeTfm)
+    public void SetProjectInfo(ProjectInfo projectToSetInfoFor)
+    {
+        if (FileHelper.GetFileExtension(projectToSetInfoFor.AbsolutePath) != ".csproj")
         {
-            _includeName = includeName;
-            _includeReferences = includeReferences;
-            _includeTfm = includeTfm;
+            throw new ArgumentException("This file is not a .csproj file.", nameof(projectToSetInfoFor));
         }
 
-        public void SetProjectInfo(ProjectInfo projectToSetInfoFor)
+        SetProjectType(projectToSetInfoFor);
+        if (_includeName)
         {
-            if (FileHelper.GetFileExtension(projectToSetInfoFor.AbsolutePath) != ".csproj")
-            {
-                throw new ArgumentException("This file is not a .csproj file.", nameof(projectToSetInfoFor));
-            }
-
-            SetProjectType(projectToSetInfoFor);
-            if (_includeName)
-            {
-                SetProjectName(projectToSetInfoFor);
-            }
-            if (_includeTfm)
-            {
-                SetProjectTFM(projectToSetInfoFor);
-            }
-            if (_includeReferences)
-            {
-                SetProjectsReferencedByProject(projectToSetInfoFor);
-            }
+            SetProjectName(projectToSetInfoFor);
         }
-
-        private void SetProjectName(ProjectInfo projectToSetInfoFor)
+        if (_includeTfm)
         {
-            projectToSetInfoFor.Name = Path.GetFileNameWithoutExtension(projectToSetInfoFor.AbsolutePath);
+            SetProjectTFM(projectToSetInfoFor);
         }
-
-        private void SetProjectType(ProjectInfo projectInfo)
+        if (_includeReferences)
         {
-            var fileContents = FileHelper.GetFileContents(projectInfo.AbsolutePath);
-
-            if (fileContents.Any(x => x.StartsWith("<Project Sdk=")))
-            {
-                projectInfo.ProjectType = ProjectType.SDKStyle;
-            }
-            else //TODO: Actually check for non-SDK style projects and throw exception if we can't determine type
-            {
-                projectInfo.ProjectType = ProjectType.Pre2017Style;
-            }
+            SetProjectsReferencedByProject(projectToSetInfoFor);
         }
+    }
 
-        private void SetProjectTFM(ProjectInfo projectInfo)
+    private void SetProjectName(ProjectInfo projectToSetInfoFor)
+    {
+        projectToSetInfoFor.Name = Path.GetFileNameWithoutExtension(projectToSetInfoFor.AbsolutePath);
+    }
+
+    private void SetProjectType(ProjectInfo projectInfo)
+    {
+        var fileContents = FileHelper.GetFileContents(projectInfo.AbsolutePath);
+
+        if (fileContents.Any(x => x.StartsWith("<Project Sdk=")))
         {
-            var projectFileXmlDocument = ParseProjectFileXml(projectInfo);
-            XmlNamespaceManager xmlManager = new XmlNamespaceManager(projectFileXmlDocument.NameTable);
-
-            switch (projectInfo.ProjectType)
-            {
-                case ProjectType.Pre2017Style:
-                    xmlManager.AddNamespace("x", "http://schemas.microsoft.com/developer/msbuild/2003");
-
-                    foreach (XmlNode item in projectFileXmlDocument.SelectNodes("//x:TargetFrameworkVersion", xmlManager))
-                    {
-                        projectInfo.TFM = item.InnerXml;
-                    }
-                    break;
-                case ProjectType.SDKStyle:
-                    foreach (XmlNode item in projectFileXmlDocument.SelectNodes("Project/PropertyGroup/TargetFramework|Project/PropertyGroup/TargetFrameworks", xmlManager))
-                    {
-                        projectInfo.TFM = item.InnerXml;
-                    }
-                    break;
-            }
+            projectInfo.ProjectType = ProjectType.SDKStyle;
         }
-
-        private void SetProjectsReferencedByProject(ProjectInfo projectInfo)
+        else //TODO: Actually check for non-SDK style projects and throw exception if we can't determine type
         {
-            var projectFileXmlDocument = ParseProjectFileXml(projectInfo);
-            XmlNamespaceManager xmlManager = new XmlNamespaceManager(projectFileXmlDocument.NameTable);
-            projectInfo.ProjectsReferenced ??= new List<ProjectInfo>();
-
-            switch (projectInfo.ProjectType)
-            {
-                case ProjectType.Pre2017Style:
-                    xmlManager.AddNamespace("x", "http://schemas.microsoft.com/developer/msbuild/2003");
-
-                    foreach (XmlNode item in projectFileXmlDocument.SelectNodes("//x:ProjectReference", xmlManager))
-                    {
-                        var referencedProjectInfo = new ProjectInfo(PathHelper.GetAbsolutePath(item.Attributes["Include"].Value, FileHelper.GetFileDirectory(projectInfo.AbsolutePath)));
-                        SetProjectInfo(referencedProjectInfo);
-                        projectInfo.ProjectsReferenced.Add(referencedProjectInfo);
-                    }
-                    break;
-                case ProjectType.SDKStyle:
-                    foreach (XmlNode item in projectFileXmlDocument.SelectNodes("Project/ItemGroup/ProjectReference", xmlManager))
-                    {
-                        var referencedProjectInfo = new ProjectInfo(PathHelper.GetAbsolutePath(item.Attributes["Include"].Value, FileHelper.GetFileDirectory(projectInfo.AbsolutePath)));
-                        SetProjectInfo(referencedProjectInfo);
-                        projectInfo.ProjectsReferenced.Add(referencedProjectInfo);
-                    }
-                    break;
-            }
+            projectInfo.ProjectType = ProjectType.Pre2017Style;
         }
+    }
 
-        private XmlDocument ParseProjectFileXml(ProjectInfo projectInfo)
+    private void SetProjectTFM(ProjectInfo projectInfo)
+    {
+        var projectFileXmlDocument = ParseProjectFileXml(projectInfo);
+        XmlNamespaceManager xmlManager = new XmlNamespaceManager(projectFileXmlDocument.NameTable);
+
+        switch (projectInfo.ProjectType)
         {
-            XmlDocument xmldoc = new XmlDocument();
-            xmldoc.Load(projectInfo.AbsolutePath);
+            case ProjectType.Pre2017Style:
+                xmlManager.AddNamespace("x", "http://schemas.microsoft.com/developer/msbuild/2003");
 
-            return xmldoc;
+                foreach (XmlNode item in projectFileXmlDocument.SelectNodes("//x:TargetFrameworkVersion", xmlManager))
+                {
+                    projectInfo.TFM = item.InnerXml;
+                }
+                break;
+            case ProjectType.SDKStyle:
+                foreach (XmlNode item in projectFileXmlDocument.SelectNodes("Project/PropertyGroup/TargetFramework|Project/PropertyGroup/TargetFrameworks", xmlManager))
+                {
+                    projectInfo.TFM = item.InnerXml;
+                }
+                break;
         }
+    }
+
+    private void SetProjectsReferencedByProject(ProjectInfo projectInfo)
+    {
+        var projectFileXmlDocument = ParseProjectFileXml(projectInfo);
+        XmlNamespaceManager xmlManager = new XmlNamespaceManager(projectFileXmlDocument.NameTable);
+        projectInfo.ProjectsReferenced ??= new List<ProjectInfo>();
+
+        switch (projectInfo.ProjectType)
+        {
+            case ProjectType.Pre2017Style:
+                xmlManager.AddNamespace("x", "http://schemas.microsoft.com/developer/msbuild/2003");
+
+                foreach (XmlNode item in projectFileXmlDocument.SelectNodes("//x:ProjectReference", xmlManager))
+                {
+                    var referencedProjectInfo = new ProjectInfo(PathHelper.GetAbsolutePath(item.Attributes["Include"].Value, FileHelper.GetFileDirectory(projectInfo.AbsolutePath)));
+                    SetProjectInfo(referencedProjectInfo);
+                    projectInfo.ProjectsReferenced.Add(referencedProjectInfo);
+                }
+                break;
+            case ProjectType.SDKStyle:
+                foreach (XmlNode item in projectFileXmlDocument.SelectNodes("Project/ItemGroup/ProjectReference", xmlManager))
+                {
+                    var referencedProjectInfo = new ProjectInfo(PathHelper.GetAbsolutePath(item.Attributes["Include"].Value, FileHelper.GetFileDirectory(projectInfo.AbsolutePath)));
+                    SetProjectInfo(referencedProjectInfo);
+                    projectInfo.ProjectsReferenced.Add(referencedProjectInfo);
+                }
+                break;
+        }
+    }
+
+    private XmlDocument ParseProjectFileXml(ProjectInfo projectInfo)
+    {
+        XmlDocument xmldoc = new XmlDocument();
+        xmldoc.Load(projectInfo.AbsolutePath);
+
+        return xmldoc;
     }
 }

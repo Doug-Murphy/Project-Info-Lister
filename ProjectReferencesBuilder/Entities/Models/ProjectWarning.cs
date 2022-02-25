@@ -1,9 +1,8 @@
-﻿namespace ProjectReferencesBuilder.Entities.Models
-{
-    public class ProjectWarning
-    {
-        public string ProjectName { get; init; }
+﻿namespace ProjectReferencesBuilder.Entities.Models;
 
-        public string Message { get; init; }
-    }
+public class ProjectWarning
+{
+    public string ProjectName { get; init; }
+
+    public string Message { get; init; }
 }

@@ -1,11 +1,10 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ProjectReferencesBuilder.Entities.Enums
+namespace ProjectReferencesBuilder.Entities.Enums;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ProjectType
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum ProjectType
-    {
-        Pre2017Style,
-        SDKStyle,
-    }
+    Pre2017Style,
+    SDKStyle,
 }

@@ -1,11 +1,10 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ProjectReferencesBuilder.Entities.Enums
+namespace ProjectReferencesBuilder.Entities.Enums;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum WarningType
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum WarningType
-    {
-        EndOfLife,
-        ProjectStyle
-    }
+    EndOfLife,
+    ProjectStyle
 }
