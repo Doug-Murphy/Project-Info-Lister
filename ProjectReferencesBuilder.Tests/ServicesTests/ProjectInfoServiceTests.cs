@@ -37,12 +37,12 @@ public class ProjectInfoServiceTests
             {
                 case "ConsoleApp1":
                     Assert.NotEmpty(project.ProjectsReferenced);
-                    Assert.Equal(1, project.ProjectsReferenced.Count);
+                    Assert.Single(project.ProjectsReferenced);
                     Assert.Equal("Services", project.ProjectsReferenced.First().Name);
                     break;
                 case "Entities":
                     Assert.NotEmpty(project.ProjectsReferenced);
-                    Assert.Equal(1, project.ProjectsReferenced.Count);
+                    Assert.Single(project.ProjectsReferenced);
                     Assert.Equal("Entities.Interface", project.ProjectsReferenced.First().Name);
                     break;
                 case "Entities.Interface":
@@ -66,7 +66,6 @@ public class ProjectInfoServiceTests
                     break;
                 default:
                     throw new XunitException($"An unexpected project was found.");
-                    break;
             }
         }
     }
@@ -120,6 +119,6 @@ public class ProjectInfoServiceTests
         projectsInSolution.Add(projectInfo1);
         projectsInSolution.Add(projectInfo2);
 
-        Assert.Equal(1, projectsInSolution.Count);
+        Assert.Single(projectsInSolution);
     }
 }

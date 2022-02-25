@@ -25,7 +25,7 @@ public class WarningsServiceTests
         var warningsFound = warningsService.GetWarnings(new List<ProjectInfo> { eolProjectInfo });
 
         Assert.NotEmpty(warningsFound);
-        Assert.All(warningsFound, (warningFound) => { Assert.IsType(typeof(Warning), warningFound); });
+        Assert.All(warningsFound, (warningFound) => { Assert.IsType<Warning>(warningFound); });
         var eolWarningFound = warningsFound.FirstOrDefault(x => x.WarningType == WarningType.EndOfLife);
         var projectStyleWarningFound = warningsFound.FirstOrDefault(x => x.WarningType == WarningType.ProjectStyle);
 
