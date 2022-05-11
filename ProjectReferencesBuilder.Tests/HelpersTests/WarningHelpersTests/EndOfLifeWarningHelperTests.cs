@@ -12,7 +12,7 @@ public class EndOfLifeWarningHelperTests
     {
         yield return new object[] { true, new ProjectInfo(_mockedAbsolutePath) { TFM = "netcoreapp2.2" } };
         yield return new object[] { true, new ProjectInfo(_mockedAbsolutePath) { TFM = "netcoreapp2.2;netcoreapp3.1" } };
-        yield return new object[] { false, new ProjectInfo(_mockedAbsolutePath) { TFM = "net5.0" } };
+        yield return new object[] { false, new ProjectInfo(_mockedAbsolutePath) { TFM = "net6.0" } };
     }
 
     [Theory]
