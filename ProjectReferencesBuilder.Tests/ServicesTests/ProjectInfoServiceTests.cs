@@ -10,6 +10,7 @@ using Xunit.Sdk;
 
 namespace ProjectReferencesBuilder.Tests.ServicesTests;
 
+[Collection("File-system access tests")]
 public class ProjectInfoServiceTests
 {
     private const string _pathToSampleProjectsSolution = "../../../../SampleProjects/SampleProjects.sln";
